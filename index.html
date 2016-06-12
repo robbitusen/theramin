@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>
+		</title>
+
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+
+			html, body {
+				margin: 0;
+				height: 100%;
+				width: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		
+		<canvas id="yes"></canvas>
+
+		<script>
+
+			//Create an audio context
+			var ctx = new AudioContext();
+
+			//create some audio nodes
+			var oscillator = ctx.createOscillator();
+			var gainNode = ctx.createGain();
+			var simplePanner = ctx.createStereoPanner();
+
+			//Create a signal chain - IE connect them up
+			//signal chain = [osc --> gain --> speakers]
+			oscillator.connect(gainNode);
+			gainNode.connect(simplePanner);
+			simplePanner.connect(ctx.destination);
+
+			//Do some stuff
+			oscillator.type = "sine";
+			oscillator.frequency.value = 200;
+			oscillator.start(0);
+			simplePanner.pan.value = -1;
+
+			//Canvas
+			var canvas = document.getElementById("yes");
+			var canvasCtx = canvas.getContext("2d");
+			console.log(canvasCtx);
+
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+			canvasCtx.fillStyle = "rgb(0, 0, 0)";
+			canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+			//DO SOME EVENT STUFF
+			window.addEventListener("mousemove", function(e){
+				
+				//Oscillator screen manip Y
+				var osc = e.screenY;
+				oscillator.frequency.value = e.screenY * 5;
+
+				//Panning screen manip X
+				var offset = window.innerWidth / 2;
+				var panMax = 1;
+				simplePanner.pan.value = (e.screenX - offset) * (panMax / offset);
+				console.log(simplePanner.pan.value);
+
+				canvasCtx.fillStyle = "rgb(" + (oscillator.frequency.value / 10) + ", 159, 255)";
+				console.log(oscillator.frequency.value);
+				canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+			});
+
+		</script>
+
+	</body>
+</html>
